@@ -1,0 +1,223 @@
+version: "3.6"
+
+networks:
+  splunknet:
+    driver: bridge
+    attachable: true
+
+services:
+  sh1:
+    networks:
+      splunknet:
+        aliases:
+          - sh1
+    image: ${SPLUNK_IMAGE:-splunk/splunk:latest}
+    hostname: sh1
+    container_name: sh1
+    environment:
+      - SPLUNK_START_ARGS=--accept-license
+      - SPLUNK_INDEXER_URL=idx1,idx2,idx3
+      - SPLUNK_SEARCH_HEAD_URL=sh2,sh3
+      - SPLUNK_SEARCH_HEAD_CAPTAIN_URL=sh1
+      - SPLUNK_CLUSTER_MASTER_URL=cm1
+      - SPLUNK_ROLE=splunk_search_head_captain
+      - SPLUNK_DEPLOYER_URL=dep1
+      - SPLUNK_DEPLOYMENT_SERVER=depserver1
+      - SPLUNK_PASSWORD
+    ports:
+      - 8003:8000
+      - 8089
+
+  sh2:
+    networks:
+      splunknet:
+        aliases:
+          - sh2
+    image: ${SPLUNK_IMAGE:-splunk/splunk:latest}
+    hostname: sh2
+    container_name: sh2
+    environment:
+      - SPLUNK_START_ARGS=--accept-license
+      - SPLUNK_INDEXER_URL=idx1,idx2,idx3
+      - SPLUNK_SEARCH_HEAD_URL=sh2,sh3
+      - SPLUNK_SEARCH_HEAD_CAPTAIN_URL=sh1
+      - SPLUNK_CLUSTER_MASTER_URL=cm1
+      - SPLUNK_ROLE=splunk_search_head
+      - SPLUNK_DEPLOYER_URL=dep1
+      - SPLUNK_DEPLOYMENT_SERVER=depserver1
+      - SPLUNK_PASSWORD
+    ports:
+      - 8004:8000
+      - 8089
+
+  sh3:
+    networks:
+      splunknet:
+        aliases:
+          - sh3
+    image: ${SPLUNK_IMAGE:-splunk/splunk:latest}
+    hostname: sh3
+    container_name: sh3
+    environment:
+      - SPLUNK_START_ARGS=--accept-license
+      - SPLUNK_INDEXER_URL=idx1,idx2,idx3
+      - SPLUNK_SEARCH_HEAD_URL=sh2,sh3
+      - SPLUNK_SEARCH_HEAD_CAPTAIN_URL=sh1
+      - SPLUNK_CLUSTER_MASTER_URL=cm1
+      - SPLUNK_ROLE=splunk_search_head
+      - SPLUNK_DEPLOYER_URL=dep1
+      - SPLUNK_DEPLOYMENT_SERVER=depserver1
+      - SPLUNK_PASSWORD
+    ports:
+      - 8005:8000
+      - 8089
+
+  idx1:
+    networks:
+      splunknet:
+        aliases:
+          - idx1
+    image: ${SPLUNK_IMAGE:-splunk/splunk:latest}
+    hostname: idx1
+    container_name: idx1
+    environment:
+      - SPLUNK_START_ARGS=--accept-license
+      - SPLUNK_INDEXER_URL=idx1,idx2,idx3
+      - SPLUNK_SEARCH_HEAD_URL=sh2,sh3
+      - SPLUNK_SEARCH_HEAD_CAPTAIN_URL=sh1
+      - SPLUNK_CLUSTER_MASTER_URL=cm1
+      - SPLUNK_ROLE=splunk_indexer
+      - SPLUNK_DEPLOYER_URL=dep1
+      - SPLUNK_DEPLOYMENT_SERVER=depserver1
+      - SPLUNK_PASSWORD
+    ports:
+      - 8006:8000
+      - 8089
+
+  idx2:
+    networks:
+      splunknet:
+        aliases:
+          - idx2
+    image: ${SPLUNK_IMAGE:-splunk/splunk:latest}
+    hostname: idx2
+    container_name: idx2
+    environment:
+      - SPLUNK_START_ARGS=--accept-license
+      - SPLUNK_INDEXER_URL=idx1,idx2,idx3
+      - SPLUNK_SEARCH_HEAD_URL=sh2,sh3
+      - SPLUNK_SEARCH_HEAD_CAPTAIN_URL=sh1
+      - SPLUNK_CLUSTER_MASTER_URL=cm1
+      - SPLUNK_ROLE=splunk_indexer
+      - SPLUNK_DEPLOYER_URL=dep1
+      - SPLUNK_DEPLOYMENT_SERVER=depserver1
+      - SPLUNK_PASSWORD
+    ports:
+      - 8007:8000
+      - 8089
+
+  idx3:
+    networks:
+      splunknet:
+        aliases:
+          - idx3
+    image: ${SPLUNK_IMAGE:-splunk/splunk:latest}
+    hostname: idx3
+    container_name: idx3
+    environment:
+      - SPLUNK_START_ARGS=--accept-license
+      - SPLUNK_INDEXER_URL=idx1,idx2,idx3
+      - SPLUNK_SEARCH_HEAD_URL=sh2,sh3
+      - SPLUNK_SEARCH_HEAD_CAPTAIN_URL=sh1
+      - SPLUNK_CLUSTER_MASTER_URL=cm1
+      - SPLUNK_ROLE=splunk_indexer
+      - SPLUNK_DEPLOYER_URL=dep1
+      - SPLUNK_DEPLOYMENT_SERVER=depserver1
+      - SPLUNK_PASSWORD
+    ports:
+      - 8008:8000
+      - 8089
+
+  hf1:
+    networks:
+      splunknet:
+        aliases:
+          - hf1
+    image: ${SPLUNK_IMAGE:-splunk/splunk:latest}
+    hostname: hf1
+    container_name: hf1
+    environment:
+      - SPLUNK_START_ARGS=--accept-license
+      - SPLUNK_ROLE=splunk_heavy_forwarder
+      - SPLUNK_INDEXER_URL=idx1-splunk.company.internal
+      - SPLUNK_DEPLOYMENT_SERVER=depserver1
+      - SPLUNK_ADD=tcp 1514
+      - SPLUNK_PASSWORD
+    ports:
+      - 8010:8000
+      - 1514
+
+  depserver1:
+    networks:
+      splunknet:
+        aliases:
+          - depserver1
+    image: ${SPLUNK_IMAGE:-splunk/splunk:latest}
+    hostname: depserver1
+    container_name: depserver1
+    environment:
+      - SPLUNK_START_ARGS=--accept-license
+      - SPLUNK_ROLE=splunk_deployment_server
+      - SPLUNK_INDEXER_URL=idx1,idx2,idx3
+      - SPLUNK_SEARCH_HEAD_URL=sh2,sh3
+      - SPLUNK_SEARCH_HEAD_CAPTAIN_URL=sh1
+      - SPLUNK_CLUSTER_MASTER_URL=cm1
+      - SPLUNK_ROLE=splunk_deployer
+      - SPLUNK_PASSWORD
+    ports:
+      - 8009:8000
+      - 8089
+
+  dep1:
+    networks:
+      splunknet:
+        aliases:
+          - dep1
+    image: ${SPLUNK_IMAGE:-splunk/splunk:latest}
+    hostname: dep1
+    container_name: dep1
+    environment:
+      - SPLUNK_START_ARGS=--accept-license
+      - SPLUNK_INDEXER_URL=idx1,idx2,idx3
+      - SPLUNK_SEARCH_HEAD_URL=sh2,sh3
+      - SPLUNK_SEARCH_HEAD_CAPTAIN_URL=sh1
+      - SPLUNK_CLUSTER_MASTER_URL=cm1
+      - SPLUNK_ROLE=splunk_deployer
+      - SPLUNK_DEPLOYER_URL=dep1
+      - SPLUNK_DEPLOYMENT_SERVER=depserver1
+      - SPLUNK_PASSWORD
+    ports:
+      - 8002:8000
+      - 8089
+
+  cm1:
+    networks:
+      splunknet:
+        aliases:
+          - cm1
+    image: ${SPLUNK_IMAGE:-splunk/splunk:latest}
+    hostname: cm1
+    container_name: cm1
+    environment:
+      - SPLUNK_START_ARGS=--accept-license
+      - SPLUNK_INDEXER_URL=idx1,idx2,idx3
+      - SPLUNK_SEARCH_HEAD_URL=sh2,sh3
+      - SPLUNK_SEARCH_HEAD_CAPTAIN_URL=sh1
+      - SPLUNK_CLUSTER_MASTER_URL=cm1
+      - SPLUNK_ROLE=splunk_cluster_master
+      - SPLUNK_DEPLOYER_URL=dep1
+      - SPLUNK_DEPLOYMENT_SERVER=depserver1
+      - SPLUNK_PASSWORD
+    ports:
+      - 8001:8000
+      - 8089

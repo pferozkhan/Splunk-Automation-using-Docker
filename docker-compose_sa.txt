@@ -1,0 +1,17 @@
+version: "3.6"
+
+services:
+  sa:
+    image: ${SPLUNK_IMAGE:-splunk/splunk:latest}
+    environment:
+      - SPLUNK_START_ARGS=--accept-license
+      - SPLUNK_ENABLE_LISTEN = 9997
+      - SPLUNK_ADD = tcp 1514
+      - SPLUNK_PASSWORD
+    ports:
+      - 8000:8000
+      - 9997:9997
+      - 8088:8088
+      - 1514:1514
+      - 514:514
+      - 8089:8089

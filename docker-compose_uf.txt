@@ -1,0 +1,11 @@
+version: "3.6"
+
+services:
+  uf1:
+    image: ${UF_IMAGE:-splunk/universalforwarder:latest}
+    container_name: uf1
+    environment:
+      - SPLUNK_START_ARGS=--accept-license
+      - SPLUNK_PASSWORD
+    ports:
+      - 9997:9997
